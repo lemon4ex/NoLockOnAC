@@ -1,0 +1,17 @@
+Package: com.byteage.noautolockonac
+Name: NoAutoLockOnAC
+Version: 1.0.1
+Description: 设备接入电源时禁止锁屏，拔出电源时恢复锁屏。
+Section: Tweaks
+Depends: firmware (>= 7.0), mobilesubstrate, preferenceloader
+Conflicts: 
+Replaces: 
+Priority: optional
+Architecture: iphoneos-arm
+Author: h4ck1n <luanpao2014@gmail.com>
+dev: 
+Homepage: 
+Depiction:
+Maintainer: h4ck1n <luanpao2014@gmail.com>
+Icon: 
+
