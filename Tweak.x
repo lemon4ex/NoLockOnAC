@@ -3,7 +3,7 @@
 #import <Foundation/NSUserDefaults+Private.h>
 #import <dlfcn.h>
 
-#define XLOG(log, ...)	NSLog(@"[NoAutoLockOnAC] " log, ##__VA_ARGS__)
+#define XLOG(log, ...)	NSLog(@"[NoLockOnAC] " log, ##__VA_ARGS__)
 
 @interface MCProfileConnection : NSObject
 + (instancetype)sharedConnection;
@@ -36,6 +36,8 @@
 @property(nonatomic, copy)NSString* bulletinID;
 @property(nonatomic, retain)NSDate* lastInterruptDate;
 @property(nonatomic, retain)NSDate* publicationDate;
+@property (nonatomic,retain) NSDate * expirationDate; 
+@property(nonatomic) BOOL preventAutomaticRemovalFromLockScreen;
 @end
 
 @interface BBServer : NSObject
@@ -43,15 +45,19 @@
 - (void)publishBulletin:(id)arg1 destinations:(unsigned long long)arg2;
 @end
 
-static NSString * nsDomainString = @"com.byteage.noautolockonac";
-static NSString * nsNotificationString = @"com.byteage.noautolockonac/preferences.changed";
+static NSString * nsDomainString = @"com.byteage.nolockonac";
+static NSString * nsNotificationString = @"com.byteage.nolockonac/preferences.changed";
 static BOOL enabled;
+static BOOL notice;
 static int origMaxInactivity = 30; ///< 默认的锁屏时间
 static BBServer* bbServer = nil;
 
 static void notificationCallback(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
 	NSNumber * enabledValue = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"enabled" inDomain:nsDomainString];
 	enabled = (enabledValue)? [enabledValue boolValue] : YES;
+
+    NSNumber * noticeValue = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"notice" inDomain:nsDomainString];
+	notice = (noticeValue)? [noticeValue boolValue] : YES;
 }
 
 static dispatch_queue_t getBBServerQueue() {
@@ -75,7 +81,7 @@ static void publishNotification(NSString *sectionID, NSDate *date, NSString *mes
     
 	BBBulletin* bulletin = [[%c(BBBulletin) alloc] init];
 
-	bulletin.title = @"NoAutoLockOnAC";
+	bulletin.title = @"NoLockOnAC";
     bulletin.message = message;
     bulletin.sectionID = sectionID;
     bulletin.bulletinID = [[NSProcessInfo processInfo] globallyUniqueString];
@@ -87,6 +93,7 @@ static void publishNotification(NSString *sectionID, NSDate *date, NSString *mes
     bulletin.showsMessagePreview = YES;
     bulletin.publicationDate = date;
     bulletin.lastInterruptDate = date;
+    bulletin.expirationDate = [date dateByAddingTimeInterval:5]; // 设置过期时间，避免通知一直存在
 
     if (banner) {
         if ([bbServer respondsToSelector:@selector(publishBulletin:destinations:)]) {
@@ -160,7 +167,9 @@ static void publishNotification(NSString *sectionID, NSDate *date, NSString *mes
 
         if(maxInactivityValue > 0){
             [profileConn setValue:[NSNumber numberWithInt:maxInactivityValue] forSetting:@"maxInactivity"];
-			publishNotification(@"com.apple.Preferences", [NSDate date], message, true);
+            if(notice) {
+                publishNotification(@"com.apple.Preferences", [NSDate date], message, true);
+            }
         }
 	}
 }

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>entry</key>
+	<dict>
+		<key>cell</key>
+		<string>PSLinkCell</string>
+		<key>icon</key>
+		<string>NoLockOnACIcon.png</string>
+		<key>label</key>
+		<string>NoLockOnAC</string>
+	</dict>
+	<key>items</key>
+	<array>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.byteage.nolockonac</string>
+			<key>key</key>
+			<string>enabled</string>
+			<key>label</key>
+			<string>启用插件</string>
+			<key>PostNotification</key>
+			<string>com.byteage.nolockonac/preferences.changed</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.byteage.nolockonac</string>
+			<key>key</key>
+			<string>notice</string>
+			<key>label</key>
+			<string>切换通知</string>
+			<key>PostNotification</key>
+			<string>com.byteage.nolockonac/preferences.changed</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>© 2019 byteage.com</string>
+			<key>footerAlignment</key>
+			<integer>1</integer>
+		</dict>
+	</array>
+	<key>title</key>
+	<string>NoLockOnAC</string>
+</dict>
+</plist>

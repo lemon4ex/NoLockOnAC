@@ -7,9 +7,9 @@ INSTALL_TARGET_PROCESSES = SpringBoard	# 会自动重启 SpringBoard
 
 include $(THEOS)/makefiles/common.mk
 
-TWEAK_NAME = NoAutoLockOnAC
+TWEAK_NAME = NoLockOnAC
 
-NoAutoLockOnAC_FILES = Tweak.x
-NoAutoLockOnAC_CFLAGS = -fobjc-arc
+NoLockOnAC_FILES = Tweak.x
+NoLockOnAC_CFLAGS = -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/tweak.mk
