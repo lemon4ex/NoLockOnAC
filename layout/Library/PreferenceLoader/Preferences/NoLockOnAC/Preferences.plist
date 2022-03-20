@@ -15,6 +15,17 @@
 	<array>
 		<dict>
 			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>isStaticText</key>
+			<true/>
+			<key>label</key>
+			<string>选项</string>
+			<key>footerText</key>
+			<string>1. 启用插件后，设备接入电源时自动关闭锁屏功能。
+2. 省电模式下系统会强制锁屏，插件可能无效果。</string>
+		</dict>
+		<dict>
+			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>default</key>
 			<true/>

@@ -102,6 +102,8 @@ static void publishNotification(NSString *sectionID, NSDate *date, NSString *mes
                 // 15 = banner and vibration things
                 [bbServer publishBulletin:bulletin destinations:15];
             });
+        } else {
+            XLOG(@"bbServer publish bulletin failed");
         }
     } else {
         if ([bbServer respondsToSelector:@selector(publishBulletin:destinations:alwaysToLockScreen:)]) {
@@ -112,6 +114,8 @@ static void publishNotification(NSString *sectionID, NSDate *date, NSString *mes
             dispatch_sync(getBBServerQueue(), ^{
                 [bbServer publishBulletin:bulletin destinations:4];
             });
+        } else {
+            XLOG(@"bbServer publish bulletin failed");
         }
     }
 
