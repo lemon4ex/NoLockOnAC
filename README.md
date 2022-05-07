@@ -1,9 +1,9 @@
 ### Description
 Disable automatic screen lock when plugged in, and restore automatic screen lock when unplugged, which is convenient for development and debugging on iPhone devices.
 
-In low power mode, the plug-in does not take effect.
+In low power mode, the tweak does not take effect.
 
-After installation, `Tweak` can be set in the settings.
+After installation, `tweak` can be set in the settings.
 
 Compatible with iOS8~iOS14
 
@@ -15,7 +15,7 @@ Cydia Repo: https://repo.byteage.com
 
 低电量模式下，插件无法生效。
 
-安装后，可以在设置中对`Tweak`进行设置。
+安装后，可以在设置中对`tweak`进行设置。
 
 兼容 iOS8~iOS14
 
