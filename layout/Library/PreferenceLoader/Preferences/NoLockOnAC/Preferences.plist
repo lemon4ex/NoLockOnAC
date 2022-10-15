@@ -22,7 +22,7 @@
 			<string>选项</string>
 			<key>footerText</key>
 			<string>1. 启用插件后，设备接入电源时自动关闭锁屏功能。
-2. 省电模式下系统会强制锁屏，插件可能无效果。</string>
+2. 插件会自动切换低电量模式，因为低电量模式下系统会强制锁屏，导致插件无效。</string>
 		</dict>
 		<dict>
 			<key>cell</key>

@@ -1,5 +1,6 @@
 #import <CoreFoundation/CoreFoundation.h>
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 #import <Foundation/NSUserDefaults+Private.h>
 #import <dlfcn.h>
 
@@ -19,30 +20,26 @@
 -(int)batteryCapacityAsPercentage;
 @end
 
-@interface BBAction : NSObject
-+ (id)actionWithLaunchBundleID:(id)arg1 callblock:(id)arg2;
+@interface _CDBatterySaver : NSObject
++(id)sharedInstance;
++(id)batterySaver;
+-(long long)setMode:(long long)arg1 ;
+-(void)setPowerMode:(long long)arg1 fromSource:(id)arg2 withCompletion:(/*^block*/id)arg3 ;
+-(void)setPowerMode:(long long)arg1 withCompletion:(/*^block*/id)arg2;
+-(BOOL)setPowerMode:(long long)arg1 error:(id*)arg2 ;
+-(long long)getPowerMode;
+-(BOOL)setPowerMode:(long long)arg1 fromSource:(id)arg2 ;
 @end
 
-@interface BBBulletin : NSObject
-@property(nonatomic, copy)NSString* sectionID;
-@property(nonatomic, copy)NSString* recordID;
-@property(nonatomic, copy)NSString* publisherBulletinID;
-@property(nonatomic, copy)NSString* title;
-@property(nonatomic, copy)NSString* message;
-@property(nonatomic, retain)NSDate* date;
-@property(assign, nonatomic) BOOL clearable;
-@property(nonatomic)BOOL showsMessagePreview;
-@property(nonatomic, copy)BBAction* defaultAction;
-@property(nonatomic, copy)NSString* bulletinID;
-@property(nonatomic, retain)NSDate* lastInterruptDate;
-@property(nonatomic, retain)NSDate* publicationDate;
-@property (nonatomic,retain) NSDate * expirationDate; 
-@property(nonatomic) BOOL preventAutomaticRemovalFromLockScreen;
-@end
-
-@interface BBServer : NSObject
-- (void)publishBulletin:(BBBulletin *)arg1 destinations:(NSUInteger)arg2 alwaysToLockScreen:(BOOL)arg3;
-- (void)publishBulletin:(id)arg1 destinations:(unsigned long long)arg2;
+@interface JBBulletinManager : NSObject
++(id)sharedInstance;
+-(id)showBulletinWithTitle:(NSString *)title message:(NSString *)message bundleID:(NSString *)bundleID;
+-(id)showBulletinWithTitle:(NSString *)title message:(NSString *)message bundleID:(NSString *)bundleID soundPath:(NSString *)soundPath;
+-(id)showBulletinWithTitle:(NSString *)title message:(NSString *)message bundleID:(NSString *)bundleID soundID:(int)inSoundID;
+-(id)showBulletinWithTitle:(NSString *)title message:(NSString *)message overrideBundleImage:(UIImage *)overridBundleImage;
+-(id)showBulletinWithTitle:(NSString *)title message:(NSString *)message overrideBundleImage:(UIImage *)overridBundleImage soundPath:(NSString *)soundPath;
+-(id)showBulletinWithTitle:(NSString *)title message:(NSString *)message overridBundleImage:(UIImage *)overridBundleImage soundID:(int)inSoundID;
+-(id)showBulletinWithTitle:(NSString *)title message:(NSString *)message bundleID:(NSString *)bundleID hasSound:(BOOL)hasSound soundID:(int)soundID vibrateMode:(int)vibrate soundPath:(NSString *)soundPath attachmentImage:(UIImage *)attachmentImage overrideBundleImage:(UIImage *)overrideBundleImage;
 @end
 
 static NSString * nsDomainString = @"com.byteage.nolockonac";
@@ -50,7 +47,7 @@ static NSString * nsNotificationString = @"com.byteage.nolockonac/preferences.ch
 static BOOL enabled;
 static BOOL notice;
 static int origMaxInactivity = 30; ///< 默认的锁屏时间
-static BBServer* bbServer = nil;
+static BOOL saverMode = 0;
 
 static void notificationCallback(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
 	NSNumber * enabledValue = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"enabled" inDomain:nsDomainString];
@@ -59,95 +56,6 @@ static void notificationCallback(CFNotificationCenterRef center, void *observer,
     NSNumber * noticeValue = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"notice" inDomain:nsDomainString];
 	notice = (noticeValue)? [noticeValue boolValue] : YES;
 }
-
-static dispatch_queue_t getBBServerQueue() {
-
-    static dispatch_queue_t queue;
-    static dispatch_once_t predicate;
-
-    dispatch_once(&predicate, ^{
-    void* handle = dlopen(NULL, RTLD_GLOBAL);
-        if (handle) {
-            dispatch_queue_t __weak *pointer = (__weak dispatch_queue_t *) dlsym(handle, "__BBServerQueue");
-            if (pointer) queue = *pointer;
-            dlclose(handle);
-        }
-    });
-
-    return queue;
-}
-
-static void publishNotification(NSString *sectionID, NSDate *date, NSString *message, bool banner) {
-    
-	BBBulletin* bulletin = [[%c(BBBulletin) alloc] init];
-
-	bulletin.title = @"NoLockOnAC";
-    bulletin.message = message;
-    bulletin.sectionID = sectionID;
-    bulletin.bulletinID = [[NSProcessInfo processInfo] globallyUniqueString];
-    bulletin.recordID = [[NSProcessInfo processInfo] globallyUniqueString];
-    bulletin.publisherBulletinID = [[NSProcessInfo processInfo] globallyUniqueString];
-    bulletin.date = date;
-    bulletin.defaultAction = [%c(BBAction) actionWithLaunchBundleID:sectionID callblock:nil];
-    bulletin.clearable = YES;
-    bulletin.showsMessagePreview = YES;
-    bulletin.publicationDate = date;
-    bulletin.lastInterruptDate = date;
-    bulletin.expirationDate = [date dateByAddingTimeInterval:5]; // 设置过期时间，避免通知一直存在
-
-    if (banner) {
-        if ([bbServer respondsToSelector:@selector(publishBulletin:destinations:)]) {
-            dispatch_sync(getBBServerQueue(), ^{
-				// 4 = to lockscreen
-                // 15 = banner and vibration things
-                [bbServer publishBulletin:bulletin destinations:15];
-            });
-        } else {
-            XLOG(@"bbServer publish bulletin failed");
-        }
-    } else {
-        if ([bbServer respondsToSelector:@selector(publishBulletin:destinations:alwaysToLockScreen:)]) {
-            dispatch_sync(getBBServerQueue(), ^{
-                [bbServer publishBulletin:bulletin destinations:4 alwaysToLockScreen:YES];
-            });
-        } else if ([bbServer respondsToSelector:@selector(publishBulletin:destinations:)]) {
-            dispatch_sync(getBBServerQueue(), ^{
-                [bbServer publishBulletin:bulletin destinations:4];
-            });
-        } else {
-            XLOG(@"bbServer publish bulletin failed");
-        }
-    }
-
-}
-
-%hook BBServer
-
-- (id)initWithQueue:(id)arg1 {
-
-    bbServer = %orig;
-    
-    return bbServer;
-
-}
-
-- (id)initWithQueue:(id)arg1 dataProviderManager:(id)arg2 syncService:(id)arg3 dismissalSyncCache:(id)arg4 observerListener:(id)arg5 utilitiesListener:(id)arg6 conduitListener:(id)arg7 systemStateListener:(id)arg8 settingsListener:(id)arg9 {
-    
-    bbServer = %orig;
-
-    return bbServer;
-
-}
-
-- (void)dealloc {
-
-    if (bbServer == self) bbServer = nil;
-
-    %orig;
-
-}
-
-%end
 
 %hook SBUIController
 - (void)ACPowerChanged {
@@ -164,15 +72,21 @@ static void publishNotification(NSString *sectionID, NSDate *date, NSString *mes
             }
             maxInactivityValue = INT32_MAX;
             message = @"自动锁屏已禁用";
+            // 充电时关闭省电模式
+            _CDBatterySaver *saver = [objc_getClass("_CDBatterySaver") batterySaver];
+            saverMode = [saver getPowerMode];
+            [saver setMode:0];
         }else{
             maxInactivityValue = origMaxInactivity;
             message = @"自动锁屏已启用";
+            _CDBatterySaver *saver = [objc_getClass("_CDBatterySaver") batterySaver];
+            [saver setMode:saverMode];
         }
 
         if(maxInactivityValue > 0){
             [profileConn setValue:[NSNumber numberWithInt:maxInactivityValue] forSetting:@"maxInactivity"];
             if(notice) {
-                publishNotification(@"com.apple.Preferences", [NSDate date], message, true);
+                [[objc_getClass("JBBulletinManager") sharedInstance] showBulletinWithTitle:@"NoLockOnAC" message:message bundleID:@"com.apple.Preferences"];
             }
         }
 	}
