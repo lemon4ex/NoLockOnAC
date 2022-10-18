@@ -47,7 +47,7 @@ static NSString * nsNotificationString = @"com.byteage.nolockonac/preferences.ch
 static BOOL enabled;
 static BOOL notice;
 static int origMaxInactivity = 30; ///< 默认的锁屏时间
-static BOOL saverMode = 0;
+static long long saverMode = 0;
 
 static void notificationCallback(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
 	NSNumber * enabledValue = (NSNumber *)[[NSUserDefaults standardUserDefaults] objectForKey:@"enabled" inDomain:nsDomainString];
