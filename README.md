@@ -5,7 +5,7 @@ In low power mode, the tweak does not take effect.
 
 After installation, `tweak` can be set in the settings.
 
-Compatible with iOS8~iOS14
+Compatible with iOS8~iOS16.6.1
 
 Cydia Repo: https://repo.byteage.com
 
@@ -17,6 +17,6 @@ Cydia Repo: https://repo.byteage.com
 
 安装后，可以在设置中对`tweak`进行设置。
 
-兼容 iOS8~iOS14
+兼容 iOS8~iOS16.6.1
 
 Cydia 源：https://repo.byteage.com
