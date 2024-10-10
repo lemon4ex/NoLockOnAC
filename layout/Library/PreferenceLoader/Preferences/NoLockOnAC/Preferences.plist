@@ -22,7 +22,7 @@
 			<string>选项</string>
 			<key>footerText</key>
 			<string>1. 启用插件后，设备接入电源时自动关闭锁屏功能。
-2. 插件会自动切换低电量模式，因为低电量模式下系统会强制锁屏，导致插件无效。</string>
+2. 注意，低电量模式下系统会强制锁屏，导致插件无效。</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -35,20 +35,6 @@
 			<string>enabled</string>
 			<key>label</key>
 			<string>启用插件</string>
-			<key>PostNotification</key>
-			<string>com.byteage.nolockonac/preferences.changed</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>default</key>
-			<true/>
-			<key>defaults</key>
-			<string>com.byteage.nolockonac</string>
-			<key>key</key>
-			<string>notice</string>
-			<key>label</key>
-			<string>切换通知</string>
 			<key>PostNotification</key>
 			<string>com.byteage.nolockonac/preferences.changed</string>
 		</dict>
