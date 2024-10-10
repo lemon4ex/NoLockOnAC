@@ -3,7 +3,7 @@ Name: NoLockOnAC
 Version: 1.0.2
 Description: 设备接入电源时禁止锁屏，拔出电源时恢复锁屏。
 Section: Tweaks
-Depends: firmware (>= 7.0), mobilesubstrate, preferenceloader, net.limneos.libbulletin
+Depends: firmware (>= 7.0), mobilesubstrate, preferenceloader
 Conflicts: 
 Replaces: 
 Priority: optional
