@@ -2,7 +2,13 @@ THEOS_DEVICE_IP = localhost -o StrictHostKeyChecking=no
 THEOS_DEVICE_PORT = 2222
 
 ARCHS = arm64 arm64e
-TARGET := iphone:clang:latest:7.0
+
+ifeq ($(THEOS_PACKAGE_SCHEME), rootless)
+TARGET = iphone:clang:14.5:15.0 # theos includes the iOS 14.5 SDK by default, it's ok
+else
+TARGET = iphone:clang:14.5:9.0
+endif
+
 INSTALL_TARGET_PROCESSES = SpringBoard	# 会自动重启 SpringBoard
 
 include $(THEOS)/makefiles/common.mk
